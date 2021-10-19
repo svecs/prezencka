@@ -16,7 +16,7 @@ public class Student {
 		super();
 		this.id = id;
 		this.name = name;
-		this.surname = surname;
+		setSurname(surname);
 		this.subjectId = subjectId;
 	}
 	@Override
@@ -46,7 +46,8 @@ public class Student {
 	public String getSurname() {
 		return surname;
 	}
-	public void setSurname(String surname) {
+	public void setSurname(String surname) throws NullPointerException {
+		if(surname == null) throw new NullPointerException("Surname cannot be null");
 		this.surname = surname;
 	}
 	

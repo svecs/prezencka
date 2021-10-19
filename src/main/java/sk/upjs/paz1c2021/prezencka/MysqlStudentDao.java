@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -48,7 +49,11 @@ public class MysqlStudentDao implements StudentDao {
 			values.put("surname", student.getSurname());
 			System.out.println("subjectid: " + student.getSubjectId());
 			values.put("subject_id", student.getSubjectId());
-			return new Student(insert.executeAndReturnKey(values).longValue(), student.getName(), student.getSurname(), student.getSubjectId());
+			try {
+				return new Student(insert.executeAndReturnKey(values).longValue(), student.getName(), student.getSurname(), student.getSubjectId());
+			} catch (DataIntegrityViolationException e) {
+				throw new EntityNotFoundException("Cannot insert student, subject with id " + student.getId(), e);
+			}
 		} else {
 			String sql = "UPDATE student SET name = ?, surname = ?, subject_id = ? WHERE id = ?";
 			int changed = jdbcTemplate.update(sql, student.getName(), student.getSurname(), student.getSubjectId(), student.getId());
