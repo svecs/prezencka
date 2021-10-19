@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class Attendance {
+	private long id;
 	private LocalDateTime when;
 	
 	private List<Student> presentStudents;
