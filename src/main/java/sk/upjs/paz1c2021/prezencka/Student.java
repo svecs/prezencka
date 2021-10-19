@@ -1,27 +1,37 @@
 package sk.upjs.paz1c2021.prezencka;
 
 public class Student {
-	private long id;
+	private Long id;
 	private String name;
 	private String surname;
+	private Long subjectId;
 	
-	public Student(long id, String name, String surname) {
+	public Long getSubjectId() {
+		return subjectId;
+	}
+	public void setSubject_id(Long subjectId) {
+		this.subjectId = subjectId;
+	}
+	public Student(long id, String name, String surname, Long subjectId) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.surname = surname;
+		this.subjectId = subjectId;
 	}
 	@Override
 	public String toString() {
 		return "Student [id=" + id + ", name=" + name + ", surname=" + surname + "]";
 	}
-	public Student(String name, String surname) {
+	public Student(String name, String surname, Long subjectId) {
 		super();
 		this.name = name;
 		this.surname = surname;
+		this.subjectId = subjectId;
+
 	}
 	
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 	public void setId(long id) {

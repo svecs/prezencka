@@ -17,7 +17,7 @@ public enum DaoFactory {
 	
 	public StudentDao getStudentDao() {
 		if(studentDao == null) {
-			studentDao = new MysqlStudentDao(jdbcTemplate);
+			studentDao = new MysqlStudentDao(getJdbcTemplate());
 		}
 		return studentDao;
 	}

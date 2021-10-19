@@ -6,8 +6,8 @@ public interface StudentDao {
 	
 	List<Student> getAll();
 	
-	Student save(Student student);
+	Student save(Student student) throws EntityNotFoundException;
 	
-	Student delete(long idStudent);
+	Student delete(long idStudent) throws EntityNotFoundException;
 	
 }
