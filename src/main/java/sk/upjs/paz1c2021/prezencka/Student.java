@@ -1,5 +1,7 @@
 package sk.upjs.paz1c2021.prezencka;
 
+import java.util.Objects;
+
 public class Student {
 	private Long id;
 	private String name;
@@ -19,9 +21,10 @@ public class Student {
 		setSurname(surname);
 		this.subjectId = subjectId;
 	}
+	
 	@Override
 	public String toString() {
-		return "Student [id=" + id + ", name=" + name + ", surname=" + surname + "]";
+		return "Student [id=" + id + ", name=" + name + ", surname=" + surname + ", subjectId=" + subjectId + "]";
 	}
 	public Student(String name, String surname, Long subjectId) {
 		super();
@@ -36,6 +39,22 @@ public class Student {
 	}
 	public void setId(long id) {
 		this.id = id;
+	}
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, name, subjectId, surname);
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Student other = (Student) obj;
+		return Objects.equals(id, other.id) && Objects.equals(name, other.name)
+				&& Objects.equals(subjectId, other.subjectId) && Objects.equals(surname, other.surname);
 	}
 	public String getName() {
 		return name;

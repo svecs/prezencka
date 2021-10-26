@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -23,18 +24,7 @@ public class MysqlStudentDao implements StudentDao {
 	public List<Student> getAll() {
 		// TODO Auto-generated method stub
 		String sql = "SELECT id, name, surname, subject_id FROM student";
-		return jdbcTemplate.query(sql, new RowMapper<Student>() {
-
-			@Override
-			public Student mapRow(ResultSet rs, int rowNum) throws SQLException {
-				long id = rs.getLong("id");
-				String name = rs.getString("name");
-				String surname = rs.getString("surname");
-				long subjectId = rs.getLong("subject_id");
-				return new Student(id, name, surname, subjectId);
-			}
-			
-		});
+		return jdbcTemplate.query(sql, new StudentRowMapper());
 	}
 
 	@Override
@@ -50,9 +40,12 @@ public class MysqlStudentDao implements StudentDao {
 			System.out.println("subjectid: " + student.getSubjectId());
 			values.put("subject_id", student.getSubjectId());
 			try {
-				return new Student(insert.executeAndReturnKey(values).longValue(), student.getName(), student.getSurname(), student.getSubjectId());
+				long v = insert.executeAndReturnKey(values).longValue();
+				System.out.println(student + " : " + v);
+				return new Student(v, student.getName(), student.getSurname(), student.getSubjectId());
 			} catch (DataIntegrityViolationException e) {
-				throw new EntityNotFoundException("Cannot insert student, subject with id " + student.getId(), e);
+				e.printStackTrace();
+				throw new EntityNotFoundException("Cannot insert student, subject with id " + student.getId() + " (probably a subject with such id does not exist in the system?)", e);
 			}
 		} else {
 			String sql = "UPDATE student SET name = ?, surname = ?, subject_id = ? WHERE id = ?";
@@ -68,7 +61,50 @@ public class MysqlStudentDao implements StudentDao {
 	@Override
 	public Student delete(long idStudent) {
 		// TODO Auto-generated method stub
-		return null;
+		Student byIdStudent = getById(idStudent);
+		String sql = "DELETE FROM student WHERE id = ?";
+	
+		try {
+			jdbcTemplate.update(sql, byIdStudent.getId());
+		}
+		catch (DataIntegrityViolationException e) {
+			throw new EntityUndeletableException("This student is a part of attendance, thus cannot be deleted.");
+		}
+		
+		return byIdStudent;
+		
+	}
+
+	@Override
+	public Student getById(long studentId) {
+		// TODO Auto-generated method stub
+		String sql = "SELECT * FROM student WHERE id = ?";
+		try {
+			return jdbcTemplate.queryForObject(sql, new StudentRowMapper(), studentId);
+		} catch(EmptyResultDataAccessException e) {
+			throw new EntityNotFoundException("Student with id " + studentId + " not found in DB!");
+		}
+	}
+	
+	private class StudentRowMapper implements RowMapper<Student> {
+
+		@Override
+		public Student mapRow(ResultSet rs, int rowNum) throws SQLException {
+			// TODO Auto-generated method stub
+			long id = rs.getLong("id");
+			String name = rs.getString("name");
+			String surname = rs.getString("surname");
+			long subjectId = rs.getLong("subject_id");
+			return new Student(id, name, surname, subjectId);
+		}
+		
+	}
+
+	@Override
+	public List<Student> getBySubjectId(long subjectId) {
+		// TODO Auto-generated method stub
+		String sql = "SELECT * FROM student WHERE subject_id = ?";
+		return jdbcTemplate.query(sql, new StudentRowMapper(), subjectId);
 	}
 
 }

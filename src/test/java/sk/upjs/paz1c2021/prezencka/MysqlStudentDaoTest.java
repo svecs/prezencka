@@ -95,4 +95,59 @@ class MysqlStudentDaoTest {
 		assertEquals(initialSize + 1, studentDao.getAll().size());
 		studentDao.delete(savedNewStudent.getId());
 	}
+	
+	@Test
+	void testGetById() {
+		Student byIdStudent = studentDao.getById(savedStudent.getId());
+		assertEquals(byIdStudent.getName(), savedStudent.getName());
+		assertEquals(byIdStudent.getSurname(), savedStudent.getSurname());
+		assertEquals(byIdStudent.getSubjectId(), savedStudent.getSubjectId());
+		assertEquals(byIdStudent.getId(), savedStudent.getId());
+		assertThrows(EntityNotFoundException.class, new Executable() {
+
+			@Override
+			public void execute() throws Throwable {
+				// TODO Auto-generated method stub
+				studentDao.getById(-1L);
+			}
+			
+		});
+	}
+	
+	@Test
+	void testDelete() {
+		Student studentToDelete = new Student("Tester","OfDelete",1L);
+		Student saved = studentDao.save(studentToDelete);
+		Student saved2 = studentDao.delete(saved.getId());
+		assertEquals(saved, saved2);
+		//assertNotNull(saved2);
+		assertThrows(EntityUndeletableException.class, new Executable() {
+
+			@Override
+			public void execute() throws Throwable {
+				// TODO Auto-generated method stub
+				studentDao.delete(1L);
+			}
+			
+		});
+	}
+	
+	@Test
+	void testGetBySubjectId() {
+		Student s1 = new Student("Test","Jeden",4L);
+		Student s2 = new Student("Test","Dva",4L);
+		Student s3 = new Student("Test","Tri",4L);
+		
+		Student s1Saved = studentDao.save(s1);
+		Student s2Saved = studentDao.save(s2);
+		Student s3Saved = studentDao.save(s3);
+		
+		List<Student> studenti = studentDao.getBySubjectId(4L);
+		assertEquals(studenti.size(),3);
+		
+		studentDao.delete(s1Saved.getId());
+		studentDao.delete(s2Saved.getId());
+		studentDao.delete(s3Saved.getId());
+
+	}
 }
